@@ -1,4 +1,5 @@
 from imgurpython import ImgurClient as img
+from concurrent.futures import ThreadPoolExecutor as thpool
 import urllib.request as url_Req
 import timeit as t
 
@@ -22,9 +23,10 @@ def main():
     id_Album = "bUaCfoz"
     imagenes = clientes.get_album_images(id_Album)
 
-    for imagen in imagenes:
-        cont += 1
-        descarga_url_img(imagen.link, cont)
+    with thpool(max_workers=10) as executor:
+        for imagen in imagenes:
+            cont += 1
+            executor.submit(descarga_url_img, imagen.link, cont)
 
 if __name__ == "__main__":
     print("\nTiempo de descarga {}".format(t.Timer(main).timeit(number=1)))
